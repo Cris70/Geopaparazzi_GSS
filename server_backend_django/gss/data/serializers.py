@@ -170,7 +170,15 @@ class NoteSerializer(serializers.ModelSerializer):
                         old2NewIdsMap[int(oldImageId)] = newImageId
                     
                     # now update form with new ids
-                    Utilities.updateImageIds(formDict, old2NewIdsMap)
+                    Utilities.updateImageIds(
+                        formDict,
+                        old2NewIdsMap,
+                        context={
+                            "note_id": note.id,
+                            "project_id": project.id if project else None,
+                            "username": user.username if user else None,
+                        },
+                    )
                     # newForm = json.dumps(formDict)
                     note.form = formDict
                     note.save()

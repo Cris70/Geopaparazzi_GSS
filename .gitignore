@@ -23,3 +23,5 @@ bin/
 docker/my_*
 server_backend_django/static/*
 
+.pdm-python
+.python-version

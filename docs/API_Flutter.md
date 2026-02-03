@@ -320,6 +320,37 @@ null
 ----dio-boundary-0720193152--
 ```
 
+Image grid widget (type: `imagegrid`)
+------------------------------------
+
+The `imagegrid` widget allows a user to select one or more images from a grid.
+
+Example form item:
+```json
+{
+  "key": "damage_type",
+  "type": "imagegrid",
+  "label": "Damage type",
+  "prompt": "Which damage is visible?",
+  "columns": 3,
+  "multi": true,
+  "images": [
+    {"id": "crack", "url": "https://example.org/images/crack.png"},
+    {"id": "spall", "url": "https://example.org/images/spall.png"},
+    {"id": "rust", "base64": "iVBORw0KGgo..."}
+  ],
+  "value": ""
+}
+```
+
+Value format:
+- Single select: `value` is a string id (e.g. `"crack"`).
+- Multi select: `value` is a semicolon-separated string (e.g. `"crack;rust"`).
+
+Notes:
+- `images` can reference `url` (client downloads directly) or `base64` (embedded image).
+- `columns` controls the grid width; rows adapt to the number of images.
+
 Response:
 ```json
 {
