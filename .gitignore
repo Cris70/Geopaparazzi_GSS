@@ -1,6 +1,7 @@
 .classpath
 .project
 .settings
+.env
 target
 *~
 *.class

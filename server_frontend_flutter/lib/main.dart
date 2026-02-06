@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_map/src/layer/tile_layer/tile_layer.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_server/com/hydrologis/gss/libs/models.dart';
 import 'package:flutter_server/com/hydrologis/gss/libs/network.dart';
 import 'package:flutter_server/com/hydrologis/gss/libs/session.dart';
@@ -64,13 +64,13 @@ class GssApp extends StatelessWidget {
               fontSize: SmashUI.BIG_SIZE,
             ),
           ),
-          bottomAppBarTheme: BottomAppBarTheme(
+          bottomAppBarTheme: BottomAppBarThemeData(
               color: SmashColors.mainBackground,
               surfaceTintColor: SmashColors.mainBackground),
-          tabBarTheme: TabBarTheme(
+          tabBarTheme: TabBarThemeData(
               labelColor: SmashColors.mainBackground,
               unselectedLabelColor: Colors.grey.shade400),
-          cardTheme: CardTheme(
+          cardTheme: CardThemeData(
             surfaceTintColor: SmashColors.mainBackground,
             color: SmashColors.mainBackground,
           ),
@@ -78,7 +78,7 @@ class GssApp extends StatelessWidget {
             backgroundColor: SmashColors.mainBackground,
             surfaceTintColor: SmashColors.mainBackground,
           ),
-          dialogTheme: DialogTheme(
+          dialogTheme: DialogThemeData(
             backgroundColor: SmashColors.mainBackground,
             shape: BeveledRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
