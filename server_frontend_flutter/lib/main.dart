@@ -248,6 +248,12 @@ class _MainPageState extends State<MainPage> {
     final userNameField = TextField(
       controller: userNameController,
       obscureText: false,
+      autofillHints: const [AutofillHints.username],
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.text,
+      autocorrect: false,
+      enableSuggestions: false,
+      onSubmitted: (_) => FocusScope.of(context).nextFocus(),
       style: loginTextStyle,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -260,13 +266,39 @@ class _MainPageState extends State<MainPage> {
     final passwordField = TextField(
       controller: passwordController,
       obscureText: true,
+      autofillHints: const [AutofillHints.password],
+      textInputAction: TextInputAction.done,
+      keyboardType: TextInputType.visiblePassword,
+      autocorrect: false,
+      enableSuggestions: false,
       style: loginTextStyle,
+      onSubmitted: (_) async {
+        await _doLogin(userNameController, passwordController);
+      },
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Password",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
+
+    Future<void> _doLogin(TextEditingController userController,
+        TextEditingController passwordController) async {
+      if (selectedProject == null) {
+        _errortext = "Please select a project.";
+      } else {
+        String user = userController.text;
+        String password = passwordController.text;
+        var loginOk =
+            await SmashSession.login(user, password, selectedProject!);
+        if (loginOk != null) {
+          _errortext = loginOk;
+        } else {
+          _errortext = "";
+        }
+      }
+      setState(() {});
+    }
 
     final loginButton = Material(
       elevation: 5.0,
@@ -276,18 +308,7 @@ class _MainPageState extends State<MainPage> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
-          if (selectedProject == null) {
-            _errortext = "Please select a project.";
-          } else {
-            String user = userNameController.text;
-            String password = passwordController.text;
-            var loginOk =
-                await SmashSession.login(user, password, selectedProject!);
-            if (loginOk != null) {
-              _errortext = loginOk;
-            }
-          }
-          setState(() {});
+          await _doLogin(userNameController, passwordController);
         },
         child: Text("Login",
             textAlign: TextAlign.center,
@@ -304,39 +325,41 @@ class _MainPageState extends State<MainPage> {
           constraints: BoxConstraints(maxWidth: 400.0),
           child: Padding(
             padding: const EdgeInsets.all(36.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                  height: 200.0,
-                  child: Image.asset(
-                    "assets/smash_logo.png",
-                    fit: BoxFit.contain,
+            child: AutofillGroup(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    height: 200.0,
+                    child: Image.asset(
+                      "assets/smash_logo.png",
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                ),
-                SizedBox(height: 45.0),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                      border: Border.all(
-                          color: SmashColors.mainDecorations, width: 1)),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 8.0, right: 8.0, top: 3, bottom: 3),
-                    child: projectsCombo,
+                  SizedBox(height: 45.0),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                        border: Border.all(
+                            color: SmashColors.mainDecorations, width: 1)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0, right: 8.0, top: 3, bottom: 3),
+                      child: projectsCombo,
+                    ),
                   ),
-                ),
-                SizedBox(height: 25.0),
-                userNameField,
-                SizedBox(height: 25.0),
-                passwordField,
-                SizedBox(height: 35.0),
-                loginButton,
-                SizedBox(height: 15.0),
-                SmashUI.normalText(_errortext,
-                    color: SmashColors.mainSelectionBorder)
-              ],
+                  SizedBox(height: 25.0),
+                  userNameField,
+                  SizedBox(height: 25.0),
+                  passwordField,
+                  SizedBox(height: 35.0),
+                  loginButton,
+                  SizedBox(height: 15.0),
+                  SmashUI.normalText(_errortext,
+                      color: SmashColors.mainSelectionBorder)
+                ],
+              ),
             ),
           ),
         ),

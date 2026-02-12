@@ -25,7 +25,8 @@ read -p "Press Enter to continue..."
 # go build the frontend
 cd ../../server_frontend_flutter/
 flutter clean
-flutter build web
+GSS_GIT_TAG=$(git -C .. describe --tags --always --dirty 2>/dev/null || echo "unknown")
+flutter build web --dart-define=GSS_GIT_TAG="$GSS_GIT_TAG"
 
 
 read -p "Press Enter to continue..."

@@ -1,7 +1,7 @@
-FROM python:3.10
+FROM python:3.10-slim-trixie
 
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -qy install nginx libgdal36
+    DEBIAN_FRONTEND=noninteractive apt-get -qy install nginx libgdal36 git
 
 WORKDIR /basefolder
 COPY server_backend_django/pyproject.toml server_backend_django/pdm.lock ./
