@@ -22,8 +22,8 @@ fi
 # Common tag format is vX.Y[.Z][suffix]. Strip leading v for pyproject version.
 VERSION="${RAW_TAG#v}"
 
-# Keep this permissive enough for versions like 4.10, 4.10.1, 4.10rc1
-if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,2}([A-Za-z0-9._-]+)?$ ]]; then
+# Keep this permissive enough for versions like 4.10, 4.10.1, 4.10rc1, 4.19+BB
+if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,2}([A-Za-z0-9._-]+)?(\+[A-Za-z0-9._-]+)?$ ]]; then
   echo "Tag '$RAW_TAG' is not a supported version format." >&2
   exit 1
 fi
