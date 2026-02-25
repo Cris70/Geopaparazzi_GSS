@@ -25,7 +25,7 @@ read -p "Press Enter to continue..."
 # go build the frontend
 cd ../../server_frontend_flutter/
 flutter clean
-GSS_GIT_TAG=$(git -C .. describe --tags --always --dirty 2>/dev/null || echo "unknown")
+GSS_GIT_TAG=$(grep -E '^version = "' ../server_backend_django/pyproject.toml | cut -d '"' -f2)
 flutter build web --dart-define=GSS_GIT_TAG="$GSS_GIT_TAG"
 
 
