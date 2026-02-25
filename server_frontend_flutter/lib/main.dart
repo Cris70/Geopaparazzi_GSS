@@ -152,6 +152,20 @@ class _MainPageState extends State<MainPage> {
   String _errortext = "";
   WebProject? selectedProject;
 
+  Future<void> _doLogin(String user, String password) async {
+    if (selectedProject == null) {
+      _errortext = "Please select a project.";
+    } else {
+      var loginOk = await SmashSession.login(user, password, selectedProject!);
+      if (loginOk != null) {
+        _errortext = loginOk;
+      } else {
+        _errortext = "";
+      }
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     var _isLogged = SmashSession.isLogged();
@@ -273,7 +287,7 @@ class _MainPageState extends State<MainPage> {
       enableSuggestions: false,
       style: loginTextStyle,
       onSubmitted: (_) async {
-        await _doLogin(userNameController, passwordController);
+        await _doLogin(userNameController.text, passwordController.text);
       },
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -282,25 +296,7 @@ class _MainPageState extends State<MainPage> {
               OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
 
-    Future<void> _doLogin(TextEditingController userController,
-        TextEditingController passwordController) async {
-      if (selectedProject == null) {
-        _errortext = "Please select a project.";
-      } else {
-        String user = userController.text;
-        String password = passwordController.text;
-        var loginOk =
-            await SmashSession.login(user, password, selectedProject!);
-        if (loginOk != null) {
-          _errortext = loginOk;
-        } else {
-          _errortext = "";
-        }
-      }
-      setState(() {});
-    }
-
-    final loginButton = Material(
+        final loginButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
       color: SmashColors.mainDecorationsDarker,
@@ -308,7 +304,7 @@ class _MainPageState extends State<MainPage> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
-          await _doLogin(userNameController, passwordController);
+          await _doLogin(userNameController.text, passwordController.text);
         },
         child: Text("Login",
             textAlign: TextAlign.center,
