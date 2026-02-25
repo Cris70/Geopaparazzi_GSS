@@ -320,6 +320,8 @@ null
 ----dio-boundary-0720193152--
 ```
 
+# Enhanced Widgets
+
 Image grid widget (type: `imagegrid`)
 ------------------------------------
 
@@ -350,6 +352,54 @@ Value format:
 Notes:
 - `images` can reference `url` (client downloads directly) or `base64` (embedded image).
 - `columns` controls the grid width; rows adapt to the number of images.
+
+Dependent combo widget (type: `dependentcombo`)
+-----------------------------------------------
+
+The `dependentcombo` widget is a combo box whose options depend on the selected value of another combo (`depends_on`).
+
+Example form items:
+```json
+{
+  "key": "fuel_group",
+  "type": "stringcombo",
+  "label": "Fuel group",
+  "value": "",
+  "values": {
+    "items": [
+      {"item": "Prati"},
+      {"item": "Arbusteti"},
+      {"item": "Foreste"}
+    ]
+  },
+  "mandatory": "yes"
+},
+{
+  "key": "fuel_macrotype",
+  "type": "dependentcombo",
+  "label": "Fuel macrotype",
+  "depends_on": "fuel_group",
+  "value": "",
+  "values_by_parent": {
+    "Prati": [
+      {"item": "Prateria discontinua"},
+      {"item": "Prateria continua"}
+    ],
+    "Arbusteti": [
+      {"item": "Arbusteti subalpini"},
+      {"item": "Arbusteti temperati"}
+    ]
+  },
+  "mandatory": "yes"
+}
+```
+
+Behavior rules:
+- While parent is empty, child options are empty and child value is empty.
+- When parent changes, child value is reset to empty.
+- Child options are loaded from `values_by_parent[parent_value]`.
+- If child is `mandatory: "yes"`, selected value must be one of the currently available options.
+- If child is not mandatory, empty value is accepted.
 
 Response:
 ```json

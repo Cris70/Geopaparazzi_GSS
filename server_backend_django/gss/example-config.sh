@@ -16,3 +16,6 @@ export CORS_ALLOWED_ORIGINS="http://localhost:80 http://localhost:8080"
 export CSRF_TRUSTED_ORIGINS="http://localhost:80 http://localhost:8080"
 
 export SECRETKEY=
+
+# frontend imagegrid rendering in readonly notes (true=show all, false=show only selected)
+export GSS_IMAGEGRID_SHOW_ALL=false
