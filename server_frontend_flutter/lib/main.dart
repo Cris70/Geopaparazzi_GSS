@@ -286,7 +286,7 @@ class _MainPageState extends State<MainPage> {
       keyboardType: TextInputType.text,
       autocorrect: false,
       enableSuggestions: false,
-      onSubmitted: (_) => FocusScope.of(context).nextFocus(),
+      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
       validator: (value) =>
           (value == null || value.trim().isEmpty) ? "Username is required." : null,
       style: loginTextStyle,
@@ -308,7 +308,7 @@ class _MainPageState extends State<MainPage> {
       autocorrect: false,
       enableSuggestions: false,
       style: loginTextStyle,
-      onSubmitted: (_) async {
+      onFieldSubmitted: (_) async {
         await _submitLogin();
       },
       validator: (value) =>
