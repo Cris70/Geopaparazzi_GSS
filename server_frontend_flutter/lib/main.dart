@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_server/com/hydrologis/gss/libs/models.dart';
 import 'package:flutter_server/com/hydrologis/gss/libs/network.dart';
@@ -151,6 +152,9 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   String _errortext = "";
   WebProject? selectedProject;
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _doLogin(String user, String password) async {
     if (selectedProject == null) {
@@ -164,6 +168,21 @@ class _MainPageState extends State<MainPage> {
       }
     }
     setState(() {});
+  }
+
+  Future<void> _submitLogin() async {
+    if (!(_loginFormKey.currentState?.validate() ?? false)) {
+      return;
+    }
+    await _doLogin(_userNameController.text.trim(), _passwordController.text);
+    TextInput.finishAutofillContext(shouldSave: _errortext.isEmpty);
+  }
+
+  @override
+  void dispose() {
+    _userNameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -258,27 +277,30 @@ class _MainPageState extends State<MainPage> {
 
     TextStyle loginTextStyle = TextStyle(fontFamily: 'Arial', fontSize: 20.0);
 
-    TextEditingController userNameController = new TextEditingController();
-    final userNameField = TextField(
-      controller: userNameController,
+    final userNameField = TextFormField(
+      key: const ValueKey("gss-login-username"),
+      controller: _userNameController,
       obscureText: false,
-      autofillHints: const [AutofillHints.username],
+      autofillHints: const [AutofillHints.username, AutofillHints.email],
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
       autocorrect: false,
       enableSuggestions: false,
       onSubmitted: (_) => FocusScope.of(context).nextFocus(),
+      validator: (value) =>
+          (value == null || value.trim().isEmpty) ? "Username is required." : null,
       style: loginTextStyle,
       decoration: InputDecoration(
+          labelText: "Username",
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Username",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
 
-    TextEditingController passwordController = new TextEditingController();
-    final passwordField = TextField(
-      controller: passwordController,
+    final passwordField = TextFormField(
+      key: const ValueKey("gss-login-password"),
+      controller: _passwordController,
       obscureText: true,
       autofillHints: const [AutofillHints.password],
       textInputAction: TextInputAction.done,
@@ -287,9 +309,12 @@ class _MainPageState extends State<MainPage> {
       enableSuggestions: false,
       style: loginTextStyle,
       onSubmitted: (_) async {
-        await _doLogin(userNameController.text, passwordController.text);
+        await _submitLogin();
       },
+      validator: (value) =>
+          (value == null || value.isEmpty) ? "Password is required." : null,
       decoration: InputDecoration(
+          labelText: "Password",
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Password",
           border:
@@ -304,7 +329,7 @@ class _MainPageState extends State<MainPage> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
-          await _doLogin(userNameController.text, passwordController.text);
+          await _submitLogin();
         },
         child: Text("Login",
             textAlign: TextAlign.center,
@@ -322,39 +347,42 @@ class _MainPageState extends State<MainPage> {
           child: Padding(
             padding: const EdgeInsets.all(36.0),
             child: AutofillGroup(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(
-                    height: 200.0,
-                    child: Image.asset(
-                      "assets/smash_logo.png",
-                      fit: BoxFit.contain,
+              child: Form(
+                key: _loginFormKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 200.0,
+                      child: Image.asset(
+                        "assets/smash_logo.png",
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 45.0),
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                        border: Border.all(
-                            color: SmashColors.mainDecorations, width: 1)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 8.0, right: 8.0, top: 3, bottom: 3),
-                      child: projectsCombo,
+                    SizedBox(height: 45.0),
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(
+                              color: SmashColors.mainDecorations, width: 1)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 8.0, right: 8.0, top: 3, bottom: 3),
+                        child: projectsCombo,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 25.0),
-                  userNameField,
-                  SizedBox(height: 25.0),
-                  passwordField,
-                  SizedBox(height: 35.0),
-                  loginButton,
-                  SizedBox(height: 15.0),
-                  SmashUI.normalText(_errortext,
-                      color: SmashColors.mainSelectionBorder)
-                ],
+                    SizedBox(height: 25.0),
+                    userNameField,
+                    SizedBox(height: 25.0),
+                    passwordField,
+                    SizedBox(height: 35.0),
+                    loginButton,
+                    SizedBox(height: 15.0),
+                    SmashUI.normalText(_errortext,
+                        color: SmashColors.mainSelectionBorder)
+                  ],
+                ),
               ),
             ),
           ),
