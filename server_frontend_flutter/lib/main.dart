@@ -170,7 +170,7 @@ class _MainPageState extends State<MainPage> {
       if (el is! html.InputElement) {
         continue;
       }
-      final type = (el.type).toLowerCase();
+      final type = (el.type ?? "").toLowerCase();
       if (passwordInput == null && type == "password") {
         passwordInput = el;
       } else if (userInput == null &&
