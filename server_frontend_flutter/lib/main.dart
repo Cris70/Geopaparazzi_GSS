@@ -1,3 +1,5 @@
+import 'dart:html' as html;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -155,6 +157,46 @@ class _MainPageState extends State<MainPage> {
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  void _applyWebPasswordManagerHints() {
+    final allInputs = html.document.querySelectorAll("input");
+    if (allInputs.isEmpty) {
+      return;
+    }
+
+    html.InputElement? passwordInput;
+    html.InputElement? userInput;
+    for (final el in allInputs) {
+      if (el is! html.InputElement) {
+        continue;
+      }
+      final type = (el.type).toLowerCase();
+      if (passwordInput == null && type == "password") {
+        passwordInput = el;
+      } else if (userInput == null &&
+          (type == "text" || type == "email" || type.isEmpty)) {
+        userInput = el;
+      }
+      if (userInput != null && passwordInput != null) {
+        break;
+      }
+    }
+
+    if (userInput != null) {
+      userInput
+        ..id = "gss-login-username"
+        ..name = "username";
+      userInput.setAttribute("autocomplete", "username");
+      userInput.setAttribute("data-1p-ignore", "false");
+    }
+    if (passwordInput != null) {
+      passwordInput
+        ..id = "gss-login-password"
+        ..name = "password";
+      passwordInput.setAttribute("autocomplete", "current-password");
+      passwordInput.setAttribute("data-1p-ignore", "false");
+    }
+  }
 
   Future<void> _doLogin(String user, String password) async {
     if (selectedProject == null) {
@@ -337,6 +379,10 @@ class _MainPageState extends State<MainPage> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _applyWebPasswordManagerHints();
+    });
 
     return Scaffold(
         body: SingleChildScrollView(
