@@ -10,7 +10,7 @@ then, exec:
 5. `./prepare_for_docker.sh`
 6. `./build_docker.sh`
 7. `docker save -o Geopaparazzi_GSS_n.nn_BB.tar bluebiloba/gss-docker:n.nn_BB`
-8. `scp Geopaparazzi_GSS_n.nn_BB.tar.gz bluebiloba@192.168.111.107:/home/bluebiloba/`
+8. `scp Geopaparazzi_GSS_n.nn_BB.tar.gz user@remote_ip:/home/user/`
 
 then, on the remote:
 
