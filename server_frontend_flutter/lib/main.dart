@@ -157,24 +157,26 @@ class _MainPageState extends State<MainPage> {
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  html.MutationObserver? _webAutofillObserver;
 
   void _applyWebPasswordManagerHints() {
-    final allInputs = html.document.querySelectorAll("input");
-    if (allInputs.isEmpty) {
+    final allEditable = html.document.querySelectorAll("input,textarea");
+    if (allEditable.isEmpty) {
       return;
     }
 
     html.InputElement? passwordInput;
-    html.InputElement? userInput;
-    for (final el in allInputs) {
-      if (el is! html.InputElement) {
-        continue;
-      }
-      final type = (el.type ?? "").toLowerCase();
-      if (passwordInput == null && type == "password") {
-        passwordInput = el;
-      } else if (userInput == null &&
-          (type == "text" || type == "email" || type.isEmpty)) {
+    html.Element? userInput;
+    for (final el in allEditable) {
+      if (el is html.InputElement) {
+        final type = (el.type ?? "").toLowerCase();
+        if (passwordInput == null && type == "password") {
+          passwordInput = el;
+        } else if (userInput == null &&
+            (type == "text" || type == "email" || type.isEmpty)) {
+          userInput = el;
+        }
+      } else if (el is html.TextAreaElement && userInput == null) {
         userInput = el;
       }
       if (userInput != null && passwordInput != null) {
@@ -183,11 +185,12 @@ class _MainPageState extends State<MainPage> {
     }
 
     if (userInput != null) {
-      userInput
-        ..id = "gss-login-username"
-        ..name = "username";
+      userInput.id = "gss-login-username";
+      userInput.setAttribute("name", "username");
       userInput.setAttribute("autocomplete", "username");
       userInput.setAttribute("data-1p-ignore", "false");
+      userInput.setAttribute("autocapitalize", "none");
+      userInput.setAttribute("spellcheck", "false");
     }
     if (passwordInput != null) {
       passwordInput
@@ -195,6 +198,17 @@ class _MainPageState extends State<MainPage> {
         ..name = "password";
       passwordInput.setAttribute("autocomplete", "current-password");
       passwordInput.setAttribute("data-1p-ignore", "false");
+    }
+  }
+
+  void _ensureWebPasswordManagerHints() {
+    _applyWebPasswordManagerHints();
+    _webAutofillObserver ??= html.MutationObserver((_, __) {
+      _applyWebPasswordManagerHints();
+    });
+    final body = html.document.body;
+    if (body != null) {
+      _webAutofillObserver!.observe(body, childList: true, subtree: true);
     }
   }
 
@@ -222,6 +236,8 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void dispose() {
+    _webAutofillObserver?.disconnect();
+    _webAutofillObserver = null;
     _userNameController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -381,7 +397,7 @@ class _MainPageState extends State<MainPage> {
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _applyWebPasswordManagerHints();
+      _ensureWebPasswordManagerHints();
     });
 
     return Scaffold(
