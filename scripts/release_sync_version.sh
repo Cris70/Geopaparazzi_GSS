@@ -3,9 +3,14 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PYPROJECT_FILE="$ROOT_DIR/server_backend_django/pyproject.toml"
+SETTINGS_FILE="$ROOT_DIR/server_backend_django/gss/gss/settings.py"
 
 if [[ ! -f "$PYPROJECT_FILE" ]]; then
   echo "Unable to find pyproject.toml at $PYPROJECT_FILE" >&2
+  exit 1
+fi
+if [[ ! -f "$SETTINGS_FILE" ]]; then
+  echo "Unable to find settings.py at $SETTINGS_FILE" >&2
   exit 1
 fi
 
@@ -29,6 +34,8 @@ if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,2}([A-Za-z0-9._-]+)?(\+[A-Za-z0-9._-]+
 fi
 
 sed -i -E "s/^version = \"[^\"]+\"/version = \"$VERSION\"/" "$PYPROJECT_FILE"
+sed -i -E "s/^[[:space:]]*GSS_VERSION[[:space:]]*=[[:space:]]*\"[^\"]+\"/GSS_VERSION = \"$VERSION\"/" "$SETTINGS_FILE"
 
 echo "Updated $PYPROJECT_FILE to version $VERSION"
+echo "Updated $SETTINGS_FILE GSS_VERSION to $VERSION"
 echo "Build frontend with: --dart-define=GSS_GIT_TAG=$VERSION"
