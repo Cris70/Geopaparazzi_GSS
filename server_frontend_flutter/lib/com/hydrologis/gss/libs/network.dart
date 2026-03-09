@@ -17,7 +17,11 @@ const DATA_NV_INTERVAL_SECONDS = 600;
 const TIMESTAMP_KEY = "ts";
 const VALUE_KEY = "v";
 const doLocal = String.fromEnvironment('DOLOCAL', defaultValue: 'false');
-const WEBAPP_URL = doLocal == 'true' ? "http://localhost:8000/" : "../";
+// Optional absolute backend base URL, expected with trailing slash, for example:
+// --dart-define=GSS_BASE_URL=http://5.8.125.188:8080/
+const gssBaseUrl = String.fromEnvironment('GSS_BASE_URL', defaultValue: '');
+const WEBAPP_URL =
+    gssBaseUrl != '' ? gssBaseUrl : (doLocal == 'true' ? "http://localhost:8000/" : "../");
 
 // const API_CONFIGRATION_URL = "${WEBAPP_URL}admin/";
 const API_LOGIN = "${WEBAPP_URL}api/login/";
